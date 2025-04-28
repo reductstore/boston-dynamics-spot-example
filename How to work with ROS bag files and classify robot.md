@@ -31,7 +31,7 @@ from bagpy import bagreader
 
 def process_bag_to_dataframe(bag_path, topic='/spot/odometry', target_label=0):
    
-    #Load a ROS bag file and generate a DataFrame with velocity features and a target label.
+    # Load a ROS bag file and generate a DataFrame with velocity features and a target label.
     
     bag = bagreader(bag_path)
     df = pd.read_csv(bag.message_by_topic(topic))
@@ -44,8 +44,8 @@ def process_bag_to_dataframe(bag_path, topic='/spot/odometry', target_label=0):
     df['angular_velocity'] = np.sqrt(df['twist.twist.angular.x']**2 + 
                                      df['twist.twist.angular.y']**2 + 
                                      df['twist.twist.angular.z']**2)
-		
-		# Assign target label
+
+    # Assign target label
     df['target'] = target_label
 
     # Keep only relevant columns
@@ -75,6 +75,7 @@ We can plot linear and angular velocities over time for each kind of motion, suc
 import matplotlib.pyplot as plt
 
 def plot_velocities(df, title=''):
+
     plt.figure(figsize=(7, 3))
 
     plt.subplot(1, 2, 1)
@@ -94,7 +95,7 @@ def plot_velocities(df, title=''):
 plot_velocities(df_forward, 'Forward Movement')
 ```
 
-![Forward Movement Plot.png](How%20to%20work%20with%20ROS%20bag%20files%20and%20classify%20robot%20%201e3282f64562803c9d80ee6aeda1a237/Forward_Movement_Plot.png)
+![Forward Movement](https://github.com/reductstore/boston-dynamics-spot-example/blob/main/forward_movement.png)
 
 # Training and Evaluating Classification Models
 
@@ -152,6 +153,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 
 def run_classification(model_name, scaler_name, X, y):
+
     # Split data into train and test sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, test_size=0.2)
     
@@ -185,7 +187,9 @@ import seaborn as sns
 
 # Plot confusion matrix
 def plot_confusion_matrix(y_test, y_pred):
+
     cm = confusion_matrix(y_test, y_pred)
+
     sns.heatmap(cm, annot=True, fmt='d', cmap='Purples')
     plt.title('Confusion Matrix')
     plt.xlabel('Predicted')
@@ -199,8 +203,10 @@ We’ll visualize the feature importance for Decision Tree and Random Forest mod
 
 # Feature importance for Decision Tree and Random Forest
 def plot_feature_importance(best_model, X_columns):
+
     importances = best_model.feature_importances_
     sorted_idx = importances.argsort()[::-1]
+
     sns.barplot(x=importances[sorted_idx], y=X_columns[sorted_idx], color='#50208B')
     plt.title('Feature Importances')
     plt.xticks(rotation=90)
@@ -217,6 +223,7 @@ y_test, y_pred, best_model, X_columns = run_classification('Random Forest', 'Min
 ```
 
 **Best parameters**: {'n_estimators': 100}
+
 **F1 Score**: 0.976
 
 The confusion matrix provides a breakdown of how the classifier performed on each movement type. The diagonal elements represent the correctly classified instances, while the off-diagonal elements indicate misclassifications. 
@@ -225,7 +232,7 @@ The confusion matrix provides a breakdown of how the classifier performed on eac
 plot_confusion_matrix(y_test, y_pred)
 ```
 
-![CM.png](How%20to%20work%20with%20ROS%20bag%20files%20and%20classify%20robot%20%201e3282f64562803c9d80ee6aeda1a237/CM.png)
+![Confusion Matrix](https://github.com/reductstore/boston-dynamics-spot-example/blob/main/confusion_matrix.png)
 
 With an F1 score of 0.976, this classifier performs well, but you can always experiment to optimize the model based on your own data.
 
@@ -235,7 +242,7 @@ After evaluating the Random Forest model, we can look at **Feature Importance** 
 plot_feature_importance(best_model, X_columns)
 ```
 
-![Feature importance.png](How%20to%20work%20with%20ROS%20bag%20files%20and%20classify%20robot%20%201e3282f64562803c9d80ee6aeda1a237/Feature_importance.png)
+![Feature Importance](https://github.com/reductstore/boston-dynamics-spot-example/blob/main/feature_importance.png)
 
 # Conclusion
 
